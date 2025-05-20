@@ -1,62 +1,18 @@
-<script type="module">
-  import * as THREE from 'https://cdn.skypack.dev/three';
-  import { GLTFLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/GLTFLoader.js';
-  import { ARButton } from 'https://cdn.skypack.dev/three/examples/jsm/webxr/ARButton.js';
-
-  let camera, scene, renderer, controller;
-  let object1, object2;
-  const selectedObject = { current: null }; // for interaction
-
-  init();
-  animate();
-
-  function init() {
-    const container = document.createElement('div');
-    document.body.appendChild(container);
-
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera();
-
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.xr.enabled = true;
-    container.appendChild(renderer.domElement);
-
-    document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
-
-    const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-    light.position.set(0.5, 1, 0.25);
-    scene.add(light);
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebXR AR Test</title>
+</head>
+<body>
+  <script type="module">
+    import { GLTFLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/GLTFLoader.js';
     const loader = new GLTFLoader();
     loader.load('model1.glb', gltf => {
-      object1 = gltf.scene;
-      object1.scale.set(0.2, 0.2, 0.2);
+      console.log('Model loaded:', gltf.scene);
+    }, undefined, err => {
+      console.error('Load error:', err);
     });
-
-    loader.load('model2.glb', gltf => {
-      object2 = gltf.scene;
-      object2.scale.set(0.2, 0.2, 0.2);
-    });
-
-    controller = renderer.xr.getController(0);
-    controller.addEventListener('select', onSelect);
-    scene.add(controller);
-  }
-
-  function onSelect() {
-    const model = !scene.getObjectById(object1?.id) ? object1 : object2;
-    if (model) {
-      model.position.setFromMatrixPosition(controller.matrixWorld);
-      scene.add(model);
-    }
-  }
-
-  function animate() {
-    renderer.setAnimationLoop(render);
-  }
-
-  function render() {
-    renderer.render(scene, camera);
-  }
-</script>
+  </script>
+</body>
+</html>
